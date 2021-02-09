@@ -1,0 +1,95 @@
+<html>
+<head>
+  <title>Mountain Madness Hackathon</title>
+  <link rel="stylesheet" href="/css/home.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script src="js/canvas.js"></script>
+  <script src="js/ui_params.js"></script>
+  <script src="js/generation.js"></script>
+
+</head>
+
+<div id="navbar" class="text-center"></div>
+
+<body>
+<br>
+<br>
+
+<div id="canvas-div">
+</div>
+
+<div class="sliderDiv">
+
+  <div class="rockColWidthDiv">
+    <h1>Rock Column Width</h1>
+    <input type="range" min="1" max="50" value="25" class="slider" id="rockColWidthRange">
+    <span id="rockColWidthNumber"></span>
+  </div>
+
+  <div class="sinAmpDiv">
+    <h1>Sine Amplitude</h1>
+    <input type="range" min="0" max="75" value="57" class="slider" id="sinAmpRange">
+    <span id="sinAmpNumber"></span>
+  </div>
+
+  <div class="sinFreqDiv">
+    <h1>SIN Frequency</h1>
+    <input type="range" min="1" max="200" value="100" class="slider" id="sinFreqRange">
+    <span id="sinFreqNumber"></span>
+  </div>
+
+  <div class="sinDeviationDiv">
+    <h1>SIN Deviation</h1>
+    <input type="range" min="1" max="10" value="5" class="slider" id="sinDeviationRange">
+    <span id="sinDeviationNumber"></span>
+  </div>
+
+  <div class="mtnHeightDiv">
+    <h1>Mountain Height</h1>
+    <input type="range" min="1" max="70" value="63" class="slider" id="mtnHeightRange">
+    <span id="mtnHeightNumber"></span>
+  </div>
+
+  <div class="cloudNumDiv">
+    <h1>Cloud Count</h1>
+    <input type="range" min="1" max="200" value="100" class="slider" id="cloudNumRange">
+    <span id="cloudNumNumber"></span>
+  </div>
+
+  <div class="cloudHeightDiv">
+    <h1>Cloud Height (Max)</h1>
+    <input type="range" min="10" max="20" value="15" class="slider" id="cloudHeightRange">
+    <span id="cloudHeightNumber"></span>
+  </div>
+
+  <div class="cloudWidthDiv">
+    <h1>Cloud Width (Max)</h1>
+    <input type="range" min="1" max="50" value="25" class="slider" id="cloudWidthRange">
+    <span id="cloudWidthNumber"></span>
+  </div>
+
+  <div class="cloudMaxHDiv">
+    <h1>Cloud Elevation</h1>
+    <input type="range" min="1" max="800" value="400" class="slider" id="cloudMaxHRange">
+    <span id="cloudMaxHNumber"></span>
+  </div>
+
+  <div class="cloudMaxWDiv">
+    <h1>Cloud Range</h1>
+    <input type="range" min="1" max="150" value="100" class="slider" id="cloudMaxWRange">
+    <span id="cloudMaxWNumber"></span>
+  </div>
+
+
+  <button id="submitbtn" onclick="generate()">Regenerate!</button>
+
+</div>
+</body>
+</html>
+
+
