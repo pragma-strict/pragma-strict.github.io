@@ -1,0 +1,1 @@
+# pragma-strict.github.io
