@@ -1,40 +1,60 @@
+let PARENT_ID = 'p5-canvas-container';
+let FPS_ID = 'interface-fps';
+let CELL_COUNT_ID = 'interface-cell-count'
 
 let canvas;
+let INTERFACE_FPS;
+let INTERFACE_CELL_COUNT;
 
 let WORLD_SIZE = 64;
 let CELL_SIZE = 8;
 let HALF_CELL_SIZE = 8/2;
+let CELL_COUNT = 16;
 
-let cells = [];
-let cellPositionOffset;
-
+let cells;
 
 function setup() {
-  canvas = createCanvas(windowWidth, windowHeight);
-  repositionCanvas();
-  cellPositionOffset = createVector(round(width/2 - (WORLD_SIZE * CELL_SIZE) /2), round(height/2 - (WORLD_SIZE * CELL_SIZE) /2));
-  for(let i = 0; i < WORLD_SIZE * WORLD_SIZE; i++){
-    cells.push(createVector(0, 0));
-  }
+  let parentStyle = window.getComputedStyle(document.getElementById(PARENT_ID));
+  canvas = createCanvas(parseInt(parentStyle.width), parseInt(parentStyle.height));
+  canvas.parent(PARENT_ID);
+
+  // Initialize interface stuff
+  INTERFACE_FPS = document.getElementById(FPS_ID);
+  INTERFACE_CELL_COUNT = document.getElementById(CELL_COUNT_ID);
+  INTERFACE_CELL_COUNT.onchange = getInterfaceUpdates;
+
+  // Set up some other stuff
+  getInterfaceUpdates();
+  initializeCells();
+  updateCellSize();
   noStroke();
   render();
 }
 
 
-function repositionCanvas()
-{
-	var x = windowWidth - width;
-	var y = windowHeight - height;
-	canvas.position(x, y);
-  cellPositionOffset = createVector(round(width/2 - (WORLD_SIZE * CELL_SIZE) /2), round(height/2 - (WORLD_SIZE * CELL_SIZE) /2));
+function initializeCells(){
+  cells = [];
+  for(let i = 0; i < WORLD_SIZE * WORLD_SIZE; i++){
+    let value = {
+      velocity: createVector(0, 0), 
+      density: 0
+    };
+    cells.push(value);
+  }
 }
 
 
 function windowResized() {
-	resizeCanvas(windowWidth, windowHeight);
-	repositionCanvas();
-  cellPositionOffset = createVector(round(width/2 - (WORLD_SIZE * CELL_SIZE) /2), round(height/2 - (WORLD_SIZE * CELL_SIZE) /2));
+  let parentStyle = window.getComputedStyle(document.getElementById(PARENT_ID));
+	resizeCanvas(parseInt(parentStyle.width), parseInt(parentStyle.height));
+  updateCellSize();
 	render();
+}
+
+
+function updateCellSize(){
+  CELL_SIZE = width / WORLD_SIZE;
+  HALF_CELL_SIZE = CELL_SIZE /2;
 }
 
 
@@ -43,18 +63,55 @@ function tick(){
   // Apply mouse velocity to cells
   let cellUnderMouse = screenToCellSpace(createVector(mouseX, mouseY));
   let mouseVelocity = createVector(mouseX - pmouseX, mouseY - pmouseY);
-  if(cellUnderMouse != -1){
-    cells[cellUnderMouse] = mouseVelocity.mult(10);
+  if(cellUnderMouse != -1 && mouseIsPressed){
+    cells[cellUnderMouse].velocity = mouseVelocity.mult(10);
   }
 
-  // Apply diffusion
+  // Apply density to cells
+  if(cellUnderMouse != -1 && mouseIsPressed){
+    cells[cellUnderMouse].density = 255;
+  }
+
+  diffuseAll();
+}
+
+
+function diffuseAll(){
   for(let i = 0; i < cells.length; i++){
-    let kernel = getCellKernel(i);
+    let kernel = getKernelAdjacent(i);
+
+    let densitySum = 0;
     let velocitySum = createVector(0, 0);
     for(let v = 0; v < kernel.length; v++){
-      velocitySum.add(cells[kernel[v]]);
+      densitySum += (cells[kernel[v]].density);
+      velocitySum.add(cells[kernel[v]].velocity);
     }
-    cells[i] = velocitySum.div(kernel.length);
+    cells[i].density = densitySum / kernel.length;
+    cells[i].velocity = velocitySum.div(kernel.length);
+  }
+}
+
+
+function diffuseVelocity(){
+  for(let i = 0; i < cells.length; i++){
+    let kernel = getKernelAdjacent(i);
+    let velocitySum = createVector(0, 0);
+    for(let v = 0; v < kernel.length; v++){
+      velocitySum.add(cells[kernel[v]].velocity);
+    }
+    cells[i].velocity = velocitySum.div(kernel.length);
+  }
+}
+
+
+function diffuseDensity(){
+  for(let i = 0; i < cells.length; i++){
+    let kernel = getKernelAdjacent(i);
+    let densitySum = 0;
+    for(let v = 0; v < kernel.length; v++){
+      densitySum += (cells[kernel[v]].density);
+    }
+    cells[i].density = densitySum / kernel.length;
   }
 }
 
@@ -62,6 +119,9 @@ function tick(){
 function draw(){
   tick();
   render();
+  if(frameCount % 10 == 0){
+    updateDataOutput();
+  }
 }
 
 
@@ -69,32 +129,39 @@ function render()
 {
   background(BG_COL);
 
-  // Draw outline around simulation bounds
-  stroke(0);
-  strokeWeight(1);
-  fill(color(0, 0, 0, 0));
-  rect(cellPositionOffset.x - HALF_CELL_SIZE, cellPositionOffset.y - HALF_CELL_SIZE, CELL_SIZE * WORLD_SIZE, CELL_SIZE * WORLD_SIZE);
+  // Render cell densities
+  // noStroke();
+  // for(let i = 0; i < cells.length; i++){
+  //   let cellScreenPos = cellToScreenSpace(i);
+  //   fill(color(0, 0, 0, 255));
+  //   let size = cells[i].velocity.mag();
+  //   rect(cellScreenPos.x, cellScreenPos.y, size, size);
+  //   //rect(cellScreenPos.x, cellScreenPos.y, CELL_SIZE, CELL_SIZE);
+  // }
 
-  // Render cell vectors
+  // Render cell velocities
   for(let i = 0; i < cells.length; i++){
     let cellScreenPos = cellToScreenSpace(i);
-    drawVector(cells[i], cellScreenPos);
+    fill(0);
+    drawVector(cells[i].velocity, cellScreenPos);
   }
+}
 
-  // Render text
-  fill(0);
-  noStroke();
-  textSize(24);
-  text("Vector Field Test", cellPositionOffset.x, cellPositionOffset.y - 15);
-  textSize(16);
-  text("FPS: " + floor(frameRate()), 
-    cellPositionOffset.x + (CELL_SIZE * WORLD_SIZE) - textWidth("FPS: 600"), 
-    cellPositionOffset.y + (CELL_SIZE * WORLD_SIZE) - 10);
+
+function updateDataOutput(){
+  INTERFACE_FPS.innerHTML = round(frameRate(), 1);
+}
+
+
+function getInterfaceUpdates(){
+  WORLD_SIZE = sqrt(INTERFACE_CELL_COUNT.value);
+  initializeCells();
+  updateCellSize();
 }
 
 
 // Return list of immediate neighbors to given cell
-function getCellKernel(index){
+function getKernelFull(index){
   let kernel = [
     index,
     getCellUp(index),
@@ -109,8 +176,19 @@ function getCellKernel(index){
   return kernel;
 }
 
+function getKernelAdjacent(index){
+  let kernel = [
+    index,
+    getCellUp(index),
+    getCellDown(index),
+    getCellLeft(index),
+    getCellRight(index)
+  ];
+  return kernel;
+}
+
 function getCellUp(index){
-  return (index - WORLD_SIZE) >= 0 ? (index - WORLD_SIZE) : -1;
+  return (index - WORLD_SIZE) >= 0 ? (index - WORLD_SIZE) : (index + WORLD_SIZE * (WORLD_SIZE -1) );
 }
 
 function getCellDown(index){
@@ -152,13 +230,13 @@ function cellToScreenSpace(index){
   y = floor(index / WORLD_SIZE);
   x *= CELL_SIZE;
   y *= CELL_SIZE;
-  return createVector(x + cellPositionOffset.x, y + cellPositionOffset.y);
+  return createVector(x, y);
 }
 
 
 function screenToCellSpace(point){
-  let x = floor((point.x - cellPositionOffset.x) / CELL_SIZE);
-  let y = floor((point.y - cellPositionOffset.y) / CELL_SIZE);
+  let x = floor(point.x / CELL_SIZE);
+  let y = floor(point.y / CELL_SIZE);
   if(x >= WORLD_SIZE || x < 0 || y >= WORLD_SIZE || y < 0){
     return -1;
   }
