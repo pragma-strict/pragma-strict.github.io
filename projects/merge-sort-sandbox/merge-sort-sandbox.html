@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <title>Merge Sort Sandbox</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <div class="grid-container">
+      <div id="p5-canvas-container"></div>
+      <div id="p5-interface">
+        <label for="custom-data">Use custom data?</label>
+        <input type="checkbox" id="interface-custom-data" name="custom-data" onclick="updateFormFieldVisibility()">
+        <br>
+        <div id="interface-input-size-wrapper">
+          <label for="input-size">Input size</label>
+          <select name="input-size" id="interface-input-size">
+            <option value="16" selected>16</option>
+            <option value="32">32</option>
+            <option value="64">64</option>
+            <option value="256">256</option>
+            <option value="1024">1024</option>
+          </select>
+          <input type="button" id="interface-generate" value="Generate" onclick="getInput()">
+          <br>
+        </div>
+        <div id="interface-data-wrapper" class="hide">
+          <label for="data">Type some numbers</label>
+          <input type="text" id="interface-data" name="data" oninput="getInput()">
+          <br>
+        </div>
+        <label for="rate">Sorting rate</label>
+        <select name="rate" id="interface-rate">
+          <option value="16" selected>16</option>
+          <option value="32">32</option>
+          <option value="64">64</option>
+          <option value="256">256</option>
+          <option value="1024">1024</option>
+        </select>
+        <br>
+        <input type="button" id="interface-restart" value="Sort!" onclick="mergeSort()">
+        <input type="button" id="interface-prev" value="Prev" onclick="previousState()">
+        <input type="button" id="interface-next" value="Next" onclick="nextState()">
+      </div>
+    </div>
+    
+    <!-- Include all our scripts -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
+    <script src="js/colour-constants.js"></script>
+    <script src="js/display.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

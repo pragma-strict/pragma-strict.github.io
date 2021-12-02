@@ -1,0 +1,44 @@
+
+@media screen and (orientation:portrait) {
+   .grid-container{
+      grid-template-columns: 10vw 65vw 10vw;
+      grid-template-rows: auto 65vw auto auto;
+   }
+}
+
+@media screen and (orientation:landscape) {
+   .grid-container{
+      grid-template-columns: auto 65vh auto;
+      grid-template-rows: 10vh 65vh 10vh auto;
+   }
+}
+
+body{
+   background-color: rgb(245, 247, 232) !important;
+}
+
+.hide{
+   display: none;
+}
+
+.grid-container{
+   display: grid;
+   min-height: 100vh;
+   padding-bottom: 5rem;
+}
+
+#p5-canvas-container{
+   grid-column: 2;
+   grid-row: 2;
+}
+
+#p5-interface{
+   grid-column: 2;
+   grid-row: 3;
+}
+
+canvas{
+   position: relative;
+   border-style: solid;
+   border-width: 0.1rem;
+}
